@@ -4,16 +4,24 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    public Color[] colors;
+    [SerializeField] private Color[] _colors;
 
-    private void OnEnable()
+    public Color[] Colors => _colors;
+
+    void OnEnable()
     {
-        InventoryEvents.OnColorUsed += RemoveColorFromInventory;
+        InventoryEvents.OnColorEquipped += EquipColorFromInventory;
+        InventoryEvents.OnColorSwap += SwapColorFromInventory;
+        InventoryEvents.OnItemDiscard += RemoveItemFromInventory;
+        InventoryEvents.OnItemPickupAttempt += AddItemToInventory;
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
-        InventoryEvents.OnColorUsed -= RemoveColorFromInventory;
+        InventoryEvents.OnColorEquipped -= EquipColorFromInventory;
+        InventoryEvents.OnColorSwap -= SwapColorFromInventory;
+        InventoryEvents.OnItemDiscard -= RemoveItemFromInventory;
+        InventoryEvents.OnItemPickupAttempt -= AddItemToInventory;
     }
 
     void Start()
@@ -23,28 +31,55 @@ public class PlayerInventory : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.I))
-        {
+        if (Input.GetKeyDown(KeyCode.I) && GameManager.Instance.CurrentActionState == ActionState.None)
+        {            
             UIManager.Instance.OpenInventory();
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Instance.CurrentActionState == ActionState.Inventory)
         {
             UIManager.Instance.CloseInventory();
         }
     }
 
-    private void RemoveColorFromInventory(Color color)
+    void EquipColorFromInventory(Color color, int index)
     {
-        // Find the color in the inventory and remove it
-        for (int i = 0; i < colors.Length; i++)
+        _colors[index] = color;
+        UIManager.Instance.ChangeColor(color, index);
+    }
+
+    void SwapColorFromInventory(Color currentColor, Color newColor, int draggableIndex, int index)
+    {
+        _colors[index] = newColor;
+        UIManager.Instance.ChangeColor(currentColor, newColor, draggableIndex, index);
+    }
+
+    void RemoveItemFromInventory(int index)
+    {
+        UIManager.Instance.ChangeColor(Color.white, index);
+        InventoryManager.Instance.SpawnItemNextToPlayer(_colors[index], transform.position);
+        _colors[index] = Color.white;
+    }
+
+    void AddItemToInventory(Color newColor)
+    {
+        int index = CanPickupItem();
+        if (index != -1)
         {
-            if (colors[i] == color)
+            _colors[index] = newColor;
+            InventoryEvents.SuccessfulItemPickup();
+        }
+    }
+
+    int CanPickupItem()
+    {
+        for (int i = 0; i < _colors.Length; i++)
+        {
+            if (_colors[i] == Color.white)
             {
-                colors[i] = Color.white;
-                UIManager.Instance.UpdateInventory(i);
-                break;
+                return i;
             }
         }
+        return -1;
     }
 }

@@ -4,16 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class Droppable : MonoBehaviour, IDropHandler
+public class DroppableEquipment : MonoBehaviour, IDropHandler
 {
     [SerializeField] private Image _image;
-
-    void Start()
-    {
-        _image = GetComponent<Image>();
-        if (_image == null)
-            Debug.LogError("Image is NULL on " + transform.name);
-    }
 
     public void OnDrop(PointerEventData eventData)
     {
@@ -21,8 +14,9 @@ public class Droppable : MonoBehaviour, IDropHandler
         if (draggedImage != null)
         {
             Color newColor = draggedImage.color;
+            Color currentColor = _image.color;
             _image.color = newColor;
-            InventoryEvents.ColorUsed(newColor);
+            InventoryEvents.ColorEquipped(currentColor, UIManager.Instance.currentSelectedItem);
         }
     }
 }

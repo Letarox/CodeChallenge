@@ -12,6 +12,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance == null || GameManager.Instance.CurrentActionState != ActionState.None)
+            return;
+
+        ApplyMovement();
+    }
+
+    private void ApplyMovement()
+    {
         float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
         Vector2 direction = new(inputX, inputY);
