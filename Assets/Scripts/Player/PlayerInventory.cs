@@ -1,32 +1,31 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [SerializeField] private Color[] _colors;
+    [SerializeField] private Item[] _inventory;
+    [SerializeField] private Item[] _equippedItems;
 
-    public Color[] Colors => _colors;
+    public Item[] Inventory => _inventory;
+    public Item[] EquippedItems => _equippedItems;
 
     void OnEnable()
     {
-        InventoryEvents.OnColorEquipped += EquipColorFromInventory;
-        InventoryEvents.OnColorSwap += SwapColorFromInventory;
+        InventoryEvents.OnItemEquipped += EquipItemFromInventory;
+        InventoryEvents.OnItemSwap += SwapItemFromInventory;
         InventoryEvents.OnItemDiscard += RemoveItemFromInventory;
         InventoryEvents.OnItemPickupAttempt += AddItemToInventory;
     }
 
     void OnDisable()
     {
-        InventoryEvents.OnColorEquipped -= EquipColorFromInventory;
-        InventoryEvents.OnColorSwap -= SwapColorFromInventory;
+        InventoryEvents.OnItemEquipped -= EquipItemFromInventory;
+        InventoryEvents.OnItemSwap -= SwapItemFromInventory;
         InventoryEvents.OnItemDiscard -= RemoveItemFromInventory;
         InventoryEvents.OnItemPickupAttempt -= AddItemToInventory;
-    }
-
-    void Start()
-    {
-        
     }
 
     void Update()
@@ -42,40 +41,58 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    void EquipColorFromInventory(Color color, int index)
+    void EquipItemFromInventory(Item item, int inventoryIndex, int equipmentIndex)
     {
-        _colors[index] = color;
-        UIManager.Instance.ChangeColor(color, index);
+        switch (item.EquipmentType)
+        {
+            case EquipmentType.Sword:
+                //can only be equipped in the main hand
+                if (equipmentIndex != 0)
+                    equipmentIndex = 0;
+                break;
+
+            case EquipmentType.Shield:
+                //can only be equipped in the offhand
+                if (equipmentIndex != 1)
+                    equipmentIndex = 1;          
+                break;
+        }
+
+        Item currentEquipped = _equippedItems[equipmentIndex];
+        _equippedItems[equipmentIndex] = item;
+        UIManager.Instance.EquipItem(item, inventoryIndex, equipmentIndex);
+        _inventory[inventoryIndex] = currentEquipped;
     }
 
-    void SwapColorFromInventory(Color currentColor, Color newColor, int draggableIndex, int index)
+    public void SwapItemFromInventory(Item currentItem, Item newItem, int draggableIndex, int index)
     {
-        _colors[index] = newColor;
-        UIManager.Instance.ChangeColor(currentColor, newColor, draggableIndex, index);
+        _inventory[draggableIndex] = newItem;
+        _inventory[index] = currentItem;
+        UIManager.Instance.ChangeItemPosition(currentItem, newItem, draggableIndex, index);
     }
 
     void RemoveItemFromInventory(int index)
     {
-        UIManager.Instance.ChangeColor(Color.white, index);
-        InventoryManager.Instance.SpawnItemNextToPlayer(_colors[index], transform.position);
-        _colors[index] = Color.white;
+        UIManager.Instance.DiscardItem(index);
+        InventoryManager.Instance.SpawnItemNextToPlayer(_inventory[index], transform.position);
+        _inventory[index] = null;
     }
 
-    void AddItemToInventory(Color newColor)
+    void AddItemToInventory(Item newItem)
     {
         int index = CanPickupItem();
         if (index != -1)
         {
-            _colors[index] = newColor;
+            _inventory[index] = newItem;
             InventoryEvents.SuccessfulItemPickup();
         }
     }
 
     int CanPickupItem()
     {
-        for (int i = 0; i < _colors.Length; i++)
+        for (int i = 0; i < _inventory.Length; i++)
         {
-            if (_colors[i] == Color.white)
+            if (_inventory[i] == null)
             {
                 return i;
             }

@@ -1,26 +1,43 @@
-# Unity generated folders
-/[Ll]ibrary/
-/[Tt]emp/
-/[Oo]bj/
-/[Bb]uild/
-/[Bb]uilds/
-/[Ll]ogs/
-/[Uu]ser[Ss]ettings/
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+*.pidb
+*.svd
+*.userprefs
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+sysinfo.txt
+*.stackdump
 
-# Visual Studio Code
+# Visual Studio
 .vscode/
-
-# Rider
-.idea/
-
-# User-specific files
+.vs/
+.vscode/settings.json
+*.code-workspace
+*.sln
 *.suo
 *.user
 *.userosscache
-*.sln.docstates
-
-# Mono Auto Generated Files
-mono_crash.*
-
-# Unity Package Manager
-/Packages/
+*.userprefs
+*.csproj
+*.csproj.user
+*.pidb
+*.pdb
+*.opendb
+*.VC.db

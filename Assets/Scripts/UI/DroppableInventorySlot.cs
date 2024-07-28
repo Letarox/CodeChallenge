@@ -16,16 +16,11 @@ public class DroppableInventorySlot : MonoBehaviour, IDropHandler
         if (draggedImage != null && draggableItem != null)
         {
             _image.raycastTarget = true;
-            Color newColor = draggedImage.color;
-            Color currentColor = _image.color;
-
-            _image.color = newColor;
-
             // Get the index of this drop slot within its parent
             int dropSlotIndex = this.transform.GetSiblingIndex();
 
             // Trigger an event to update the UIManager or inventory
-            InventoryEvents.ColorSwapped(currentColor, newColor, draggableItem.InventoryIndex, dropSlotIndex);
+            InventoryEvents.ItemSwapped(UIManager.Instance.PlayerInventory.Inventory[draggableItem.InventoryIndex], UIManager.Instance.PlayerInventory.Inventory[dropSlotIndex], draggableItem.InventoryIndex, dropSlotIndex);
         }
     }
 }

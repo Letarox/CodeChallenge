@@ -32,19 +32,34 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image[] _itemSlotImages;
     [SerializeField] private Image _playerCharacter;
     [SerializeField] private TextMeshProUGUI _proximityText;
+    [SerializeField] private GameObject[] _itemDetailsPanelInventory, _itemDetailsPanelEquipment;
+    [SerializeField] private TextMeshProUGUI[] _itemNamesTextInventory, _itemEquipmentTypeTextInventory, _itemDescriptionTextInventory;
+    [SerializeField] private TextMeshProUGUI[] _itemNamesTextEquipment, _itemEquipmentTypeTextEquipment, _itemDescriptionTextEquipment;
+    [SerializeField] private Sprite _blankSprite;
+    [SerializeField] private Image[] _equipmentImage;
 
     private PlayerInventory _playerInventory;   
     public PlayerInventory PlayerInventory => _playerInventory;
-    public int currentSelectedItem = 0;
+    public Sprite BlankSprite => _blankSprite;
+    private int _currentSelectedItem = 0;
+    public int CurrentSelectedItem => _currentSelectedItem;
 
     void OnEnable()
     {
         InventoryEvents.OnBeginDrag += SelectItem;
+        InventoryEvents.OnBeginHoverInventory += OpenDescriptionPanelInventory;
+        InventoryEvents.OnEndHoverInventory += CloseDescriptionPanelInventory;
+        InventoryEvents.OnBeginHoverEquipment += OpenDescriptionPanelEquipment;
+        InventoryEvents.OnEndHoverEquipment += CloseDescriptionPanelEquipment;
     }
 
     void OnDisable()
     {
         InventoryEvents.OnBeginDrag -= SelectItem;
+        InventoryEvents.OnBeginHoverInventory -= OpenDescriptionPanelInventory;
+        InventoryEvents.OnEndHoverInventory -= CloseDescriptionPanelInventory;
+        InventoryEvents.OnBeginHoverEquipment -= OpenDescriptionPanelEquipment;
+        InventoryEvents.OnEndHoverEquipment -= CloseDescriptionPanelEquipment;
     }
 
     void Start()
@@ -54,28 +69,22 @@ public class UIManager : MonoBehaviour
             Debug.LogError("Player Inventory is NULL on UI Manager.");
     }
 
-    void Update()
-    {
-        
-    }
-
     public void OpenInventory()
     {
         GameManager.Instance.SetActionState(ActionState.Inventory);
         _inventoryPanel.SetActive(true);
         _playerCharacter.color = _playerInventory.transform.GetComponent<SpriteRenderer>().color;
 
-        for(int i = 0; i < _playerInventory.Colors.Length; i++)
+        for(int i = 0; i < _playerInventory.Inventory.Length; i++)
         {
-            if (_playerInventory.Colors[i] == Color.white)
-            {
-                _itemSlotImages[i].enabled = false;
-            }
+            if(_playerInventory.Inventory[i] != null)
+                _itemSlotImages[i].sprite = _playerInventory.Inventory[i].Icon;
             else
             {
-                _itemSlotImages[i].color = _playerInventory.Colors[i];
-                _itemSlotImages[i].enabled = true;
+                _itemSlotImages[i].sprite = _blankSprite;
+                CheckToDisableIcon(_itemSlotImages[i]);
             }
+                
         }
     }
 
@@ -85,40 +94,115 @@ public class UIManager : MonoBehaviour
         _inventoryPanel.SetActive(false);        
     }
 
-    public void ChangeColor(Color newColor, int index)
+    public void EquipItem(Item newItem, int inventoryIndex, int equipmentIndex)
     {
-        _itemSlotImages[index].color = newColor;
-        if (newColor == Color.white)
-            _itemSlotImages[index].enabled = false;
+        Sprite currentEquipped = _equipmentImage[equipmentIndex].sprite;
+        if(currentEquipped == null)
+        {
+            _itemSlotImages[inventoryIndex].sprite = _blankSprite;
+        }
         else
-            _itemSlotImages[index].enabled = true;
+        {
+            _itemSlotImages[inventoryIndex].sprite = currentEquipped;
+        }
 
-        currentSelectedItem = -1;
+        _equipmentImage[equipmentIndex].sprite = newItem.Icon;
+        CheckToDisableIcon(_itemSlotImages[inventoryIndex]);
+        _currentSelectedItem = -1;
     }
 
-    public void ChangeColor(Color currentColor, Color newColor, int draggableIndex, int oldIndex)
+    public void EquipTwoHandedItem(Item newItem, int inventoryIndex, int equipmentIndex)
     {
-        _itemSlotImages[oldIndex].color = newColor;
-        if (newColor == Color.white)
-            _itemSlotImages[oldIndex].enabled = false;
-        else
-            _itemSlotImages[oldIndex].enabled = true;
+        for(int i = 0; i < _equipmentImage.Length; i++)
+        {
+            _equipmentImage[i].sprite = _blankSprite;
+        }
 
-        _itemSlotImages[draggableIndex].color = currentColor;
-        if (currentColor == Color.white)
-            _itemSlotImages[draggableIndex].enabled = false;
+        _equipmentImage[equipmentIndex].sprite = newItem.Icon;
+        CheckToDisableIcon(_itemSlotImages[inventoryIndex]);
+        _currentSelectedItem = -1;
+    }
+
+    public void ChangeItemPosition(Item currentItem, Item newItem, int draggableIndex, int oldIndex)
+    {
+        if (newItem == null)
+        {
+            _itemSlotImages[draggableIndex].sprite = _blankSprite;
+        }
         else
-            _itemSlotImages[draggableIndex].enabled = true;
-        currentSelectedItem = -1;
+        {
+            _itemSlotImages[draggableIndex].sprite = newItem.Icon;
+        }
+
+        if (currentItem == null)
+        {
+            _itemSlotImages[oldIndex].sprite = _blankSprite;
+        }
+        else
+        {
+            _itemSlotImages[oldIndex].sprite = currentItem.Icon;
+        }
+
+        CheckToDisableIcon(_itemSlotImages[draggableIndex]);
+        CheckToDisableIcon(_itemSlotImages[oldIndex]);
+        _currentSelectedItem = -1;
+    }
+
+    void CheckToDisableIcon(Image image)
+    {
+        if(image.sprite == _blankSprite || image.sprite == null)
+        {
+            image.raycastTarget = false;
+        }
+        else
+        {
+            image.raycastTarget = true;
+        }
     }
 
     void SelectItem(int index)
     {
-        currentSelectedItem = index;
+        _currentSelectedItem = index;
     }
 
     public void SetProximityMessage(bool state)
     {
         _proximityText.gameObject.SetActive(state);
+    }
+
+    public void OpenDescriptionPanelInventory(int index)
+    {
+        if (PlayerInventory.Inventory[index] == null)
+            return;
+        _itemDetailsPanelInventory[index].SetActive(true);
+        _itemNamesTextInventory[index].text = PlayerInventory.Inventory[index].Name;
+        _itemEquipmentTypeTextInventory[index].text = PlayerInventory.Inventory[index].EquipmentType.ToString();
+        _itemDescriptionTextInventory[index].text = PlayerInventory.Inventory[index].Description;
+    }
+
+    public void OpenDescriptionPanelEquipment(int index)
+    {
+        if (PlayerInventory.EquippedItems[index] == null)
+            return;
+
+        _itemDetailsPanelEquipment[index].SetActive(true);
+        _itemNamesTextEquipment[index].text = PlayerInventory.EquippedItems[index].Name;
+        _itemEquipmentTypeTextEquipment[index].text = PlayerInventory.EquippedItems[index].EquipmentType.ToString();
+        _itemDescriptionTextEquipment[index].text = PlayerInventory.EquippedItems[index].Description;
+    }
+
+    public void CloseDescriptionPanelInventory(int index)
+    {
+        _itemDetailsPanelInventory[index].SetActive(false);
+    }
+
+    public void CloseDescriptionPanelEquipment(int index)
+    {
+        _itemDetailsPanelEquipment[index].SetActive(false);
+    }
+
+    public void DiscardItem(int index)
+    {
+        _itemSlotImages[index].sprite = _blankSprite;
     }
 }

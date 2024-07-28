@@ -6,7 +6,7 @@ public class DroppedItem : MonoBehaviour
 {
     private bool _isPlayerNear = false;
     private PlayerInventory _playerInventory;
-    private Color _myColor;
+    private Item _item;
 
     void OnEnable()
     {
@@ -18,11 +18,15 @@ public class DroppedItem : MonoBehaviour
         InventoryEvents.OnItemSucessfulPickup -= SelfDestruct;
     }
 
+    public void SetupItem(Item item)
+    {
+        _item = item;
+    }
+
     void Start()
     {
-        _myColor = GetComponent<SpriteRenderer>().color;
-        if (_myColor == null)
-            Debug.LogError("MyColor is NULL on " + transform.name);
+        if (_item == null)
+            Debug.LogError("Item is NULL on " + transform.name);
     }
 
     void Update()
@@ -31,7 +35,7 @@ public class DroppedItem : MonoBehaviour
         {
             if(_playerInventory != null)
             {
-                InventoryEvents.AttempToPickupItem(_myColor);
+                InventoryEvents.AttempToPickupItem(_item);
             }
         }
     }

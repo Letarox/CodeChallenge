@@ -40,13 +40,13 @@ public class InventoryManager : MonoBehaviour
         
     }
 
-    public void SpawnItemNextToPlayer(Color itemColor, Vector3 dropPosition)
+    public void SpawnItemNextToPlayer(Item item, Vector3 dropPosition)
     {
         // Calculate a random position within a circle of radius spawnRadius around the drop position
         Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
         Vector3 spawnPosition = dropPosition + new Vector3(randomOffset.x, randomOffset.y, 0);
 
-        var item = Instantiate(_itemOverworldPrefab, spawnPosition, Quaternion.identity);
-        item.GetComponent<SpriteRenderer>().color = itemColor;
+        var tempItem = Instantiate(_itemOverworldPrefab, spawnPosition, Quaternion.identity);
+        tempItem.GetComponent<DroppedItem>().SetupItem(item);
     }
 }

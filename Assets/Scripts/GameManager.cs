@@ -51,7 +51,7 @@ public enum ActionState
 
 public enum EquipmentType
 {
-    OneHandedWeapon,
+    Sword,
     Shield,
-    TwoHandedWeapon
+    Axe
 }

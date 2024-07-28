@@ -4,22 +4,25 @@ using UnityEngine.EventSystems;
 
 public class InventoryEvents : MonoBehaviour
 {
-    public static event Action<Color, int> OnColorEquipped;
-    public static event Action<Color, Color, int, int> OnColorSwap;
+    public static event Action<Item, int, int> OnItemEquipped;
+    public static event Action<Item, Item, int, int> OnItemSwap;
     public static event Action<int> OnBeginDrag;
-    public static event Action<int> OnEndDrag;
     public static event Action<int> OnItemDiscard;
-    public static event Action<Color> OnItemPickupAttempt;
+    public static event Action<Item> OnItemPickupAttempt;
     public static event Action OnItemSucessfulPickup;
+    public static event Action<int> OnBeginHoverInventory;
+    public static event Action<int> OnEndHoverInventory;
+    public static event Action<int> OnBeginHoverEquipment;
+    public static event Action<int> OnEndHoverEquipment;
 
-    public static void ColorEquipped(Color color, int index)
+    public static void ItemEquipped(Item item, int inventoryIndex, int equipmentIndex)
     {
-        OnColorEquipped?.Invoke(color, index);
+        OnItemEquipped?.Invoke(item, inventoryIndex, equipmentIndex);
     }
 
-    public static void ColorSwapped(Color currentColor, Color newColor, int draggableIndex, int index)
+    public static void ItemSwapped(Item currentItem, Item newItem, int draggableIndex, int index)
     {
-        OnColorSwap?.Invoke(currentColor, newColor, draggableIndex, index);
+        OnItemSwap?.Invoke(currentItem, newItem, draggableIndex, index);
     }
 
     public static void BeginDraggin(int index)
@@ -27,17 +30,12 @@ public class InventoryEvents : MonoBehaviour
         OnBeginDrag?.Invoke(index);
     }
 
-    public static void EndDraggin(int index)
-    {
-        OnEndDrag?.Invoke(index);
-    }
-
     public static void DiscardItem(int index)
     {
         OnItemDiscard?.Invoke(index);
     }
 
-    public static void AttempToPickupItem(Color itemColor)
+    public static void AttempToPickupItem(Item itemColor)
     {
         OnItemPickupAttempt?.Invoke(itemColor);
     }
@@ -45,5 +43,25 @@ public class InventoryEvents : MonoBehaviour
     public static void SuccessfulItemPickup()
     {
         OnItemSucessfulPickup?.Invoke();
+    }
+
+    public static void BeginHoverInventory(int index)
+    {
+        OnBeginHoverInventory?.Invoke(index);
+    }
+
+    public static void EndHoverInventory(int index)
+    {
+        OnEndHoverInventory?.Invoke(index);
+    }
+
+    public static void BeginHoverEquipment(int index)
+    {
+        OnBeginHoverEquipment?.Invoke(index);
+    }
+
+    public static void EndHoverEquipment(int index)
+    {
+        OnEndHoverEquipment?.Invoke(index);
     }
 }

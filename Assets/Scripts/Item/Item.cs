@@ -7,9 +7,11 @@ using UnityEngine.UI;
 public class Item : ScriptableObject
 {
     [SerializeField] private string _name;
+    [TextArea][SerializeField] string description;
     [SerializeField] private Sprite _icon;
     [SerializeField] private EquipmentType _equipmentType;
     public string Name => _name;
+    public string Description => description;
     public Sprite Icon => _icon;
     public EquipmentType EquipmentType => _equipmentType;
 }

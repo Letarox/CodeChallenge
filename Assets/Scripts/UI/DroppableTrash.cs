@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 
 public class DroppableTrash : MonoBehaviour, IDropHandler
 {
-    //identify which item has dropped here, remove the item from inventory and throw it on the ground
     public void OnDrop(PointerEventData eventData)
     {
         Image draggedImage = eventData.pointerDrag.GetComponent<Image>();

@@ -4,12 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class DraggableInventorySlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class DraggableInventorySlot : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Image _image;
     [SerializeField] private int _inventoryIndex;
     private Vector3 _originalPosition;
-
     public int InventoryIndex => _inventoryIndex;
 
     void Start()
@@ -33,8 +32,17 @@ public class DraggableInventorySlot : MonoBehaviour, IDragHandler, IBeginDragHan
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        InventoryEvents.EndDraggin(_inventoryIndex);
         _image.raycastTarget = true;
         _image.rectTransform.localPosition = _originalPosition;
+    }
+
+    public void OnPointerEnter(PointerEventData pointerEventData)
+    {
+        InventoryEvents.BeginHoverInventory(_inventoryIndex);
+    }
+
+    public void OnPointerExit(PointerEventData pointerEventData)
+    {
+        InventoryEvents.EndHoverInventory(_inventoryIndex);
     }
 }

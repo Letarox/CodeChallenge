@@ -4,19 +4,36 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class DroppableEquipment : MonoBehaviour, IDropHandler
+public class DroppableEquipment : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private Image _image;
+    [SerializeField] private int _equipmentIndex;
+
+    private Item _item;
+    public Image Image => _image;
 
     public void OnDrop(PointerEventData eventData)
     {
         Image draggedImage = eventData.pointerDrag.GetComponent<Image>();
         if (draggedImage != null)
         {
-            Color newColor = draggedImage.color;
-            Color currentColor = _image.color;
-            _image.color = newColor;
-            InventoryEvents.ColorEquipped(currentColor, UIManager.Instance.currentSelectedItem);
+            _item = UIManager.Instance.PlayerInventory.Inventory[UIManager.Instance.CurrentSelectedItem];
+            InventoryEvents.ItemEquipped(_item, UIManager.Instance.CurrentSelectedItem, _equipmentIndex);
         }
+    }
+
+    public void OnPointerEnter(PointerEventData pointerEventData)
+    {
+        InventoryEvents.BeginHoverEquipment(_equipmentIndex);
+    }
+
+    public void OnPointerExit(PointerEventData pointerEventData)
+    {
+        InventoryEvents.EndHoverEquipment(_equipmentIndex);
+    }
+
+    public void UpdateImage(Sprite sprite)
+    {
+        _image.sprite = sprite;
     }
 }
