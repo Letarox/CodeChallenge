@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Blue Shield
   m_EditorClassIdentifier: 
   _name: Blue Shield
-  description: 'Beautiful shield!
+  _description: 'A resistant shield!
 
-    +3 Defense'
+    +2 Defense'
   _icon: {fileID: 21300000, guid: e7e5a132708f4ca48a3f042acf52cc93, type: 3}
   _equipmentType: 1

@@ -30,7 +30,8 @@ public class GameManager : MonoBehaviour
     public ActionState CurrentActionState => _currentActionState;
 
     void Update()
-    {        
+    {
+        //if the player presses ESC and the ActionState is None, it quits the application
         if (Input.GetKeyDown(KeyCode.Escape) && _currentActionState == ActionState.None)
         {
             Application.Quit();

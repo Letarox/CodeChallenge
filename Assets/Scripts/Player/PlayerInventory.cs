@@ -1,18 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    [SerializeField] private Item[] _inventory;
-    [SerializeField] private Item[] _equippedItems;
-
-    public Item[] Inventory => _inventory;
-    public Item[] EquippedItems => _equippedItems;
-
-    void OnEnable()
+    private void OnEnable()
     {
         InventoryEvents.OnItemEquipped += EquipItemFromInventory;
         InventoryEvents.OnItemSwap += SwapItemFromInventory;
@@ -20,7 +10,7 @@ public class PlayerInventory : MonoBehaviour
         InventoryEvents.OnItemPickupAttempt += AddItemToInventory;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         InventoryEvents.OnItemEquipped -= EquipItemFromInventory;
         InventoryEvents.OnItemSwap -= SwapItemFromInventory;
@@ -28,10 +18,10 @@ public class PlayerInventory : MonoBehaviour
         InventoryEvents.OnItemPickupAttempt -= AddItemToInventory;
     }
 
-    void Update()
+    private void Update()
     {
         if (Input.GetKeyDown(KeyCode.I) && GameManager.Instance.CurrentActionState == ActionState.None)
-        {            
+        {
             UIManager.Instance.OpenInventory();
         }
 
@@ -41,62 +31,23 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    void EquipItemFromInventory(Item item, int inventoryIndex, int equipmentIndex)
+    private void EquipItemFromInventory(Item item, int inventoryIndex, int equipmentIndex)
     {
-        switch (item.EquipmentType)
-        {
-            case EquipmentType.Sword:
-                //can only be equipped in the main hand
-                if (equipmentIndex != 0)
-                    equipmentIndex = 0;
-                break;
-
-            case EquipmentType.Shield:
-                //can only be equipped in the offhand
-                if (equipmentIndex != 1)
-                    equipmentIndex = 1;          
-                break;
-        }
-
-        Item currentEquipped = _equippedItems[equipmentIndex];
-        _equippedItems[equipmentIndex] = item;
-        UIManager.Instance.EquipItem(item, inventoryIndex, equipmentIndex);
-        _inventory[inventoryIndex] = currentEquipped;
+        InventoryManager.Instance.EquipItemFromInventory(item, inventoryIndex, equipmentIndex);
     }
 
-    public void SwapItemFromInventory(Item currentItem, Item newItem, int draggableIndex, int index)
+    private void SwapItemFromInventory(Item currentItem, Item newItem, int draggableIndex, int index)
     {
-        _inventory[draggableIndex] = newItem;
-        _inventory[index] = currentItem;
-        UIManager.Instance.ChangeItemPosition(currentItem, newItem, draggableIndex, index);
+        InventoryManager.Instance.SwapItemFromInventory(currentItem, newItem, draggableIndex, index);
     }
 
-    void RemoveItemFromInventory(int index)
+    private void RemoveItemFromInventory(int index)
     {
-        UIManager.Instance.DiscardItem(index);
-        InventoryManager.Instance.SpawnItemNextToPlayer(_inventory[index], transform.position);
-        _inventory[index] = null;
+        InventoryManager.Instance.RemoveItemFromInventory(index);
     }
 
-    void AddItemToInventory(Item newItem)
+    private void AddItemToInventory(Item newItem)
     {
-        int index = CanPickupItem();
-        if (index != -1)
-        {
-            _inventory[index] = newItem;
-            InventoryEvents.SuccessfulItemPickup();
-        }
-    }
-
-    int CanPickupItem()
-    {
-        for (int i = 0; i < _inventory.Length; i++)
-        {
-            if (_inventory[i] == null)
-            {
-                return i;
-            }
-        }
-        return -1;
+        InventoryManager.Instance.AddItemToInventory(newItem);
     }
 }

@@ -31,6 +31,7 @@ public class DroppedItem : MonoBehaviour
 
     void Update()
     {
+        //check if the player pressed E, he is close to the item and the game AcionState is free to play
         if(Input.GetKeyDown(KeyCode.E) && _isPlayerNear && GameManager.Instance.CurrentActionState == ActionState.None)
         {
             if(_playerInventory != null)
@@ -42,18 +43,23 @@ public class DroppedItem : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && GameManager.Instance.CurrentActionState == ActionState.None)
+        //check comes in range and set the bool. If we are not in Inventory Mode, display the proper message to pickup the item
+        if (other.CompareTag("Player"))
         {
-            _isPlayerNear = true;            
-            UIManager.Instance.SetProximityMessage(true);
+            _isPlayerNear = true;
             _playerInventory = other.GetComponent<PlayerInventory>();
+
             if (_playerInventory == null)
                 Debug.LogError("Player Inventory is NULL on " + transform.name);
+
+            if (GameManager.Instance.CurrentActionState == ActionState.None)
+                 UIManager.Instance.SetProximityMessage(true);
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
+        //when the player leaves it resets everything
         if (other.CompareTag("Player"))
         {
             _isPlayerNear = false;

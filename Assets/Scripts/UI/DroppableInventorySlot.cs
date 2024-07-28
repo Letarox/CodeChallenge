@@ -10,17 +10,19 @@ public class DroppableInventorySlot : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
+        //gets a handle of the image that was dragged over, and item
         Image draggedImage = eventData.pointerDrag.GetComponent<Image>();
-        DraggableInventorySlot draggableItem = eventData.pointerDrag.GetComponent<DraggableInventorySlot>();
+        DraggableInventorySlot draggableInventorySlot = eventData.pointerDrag.GetComponent<DraggableInventorySlot>();
 
-        if (draggedImage != null && draggableItem != null)
+        //check if we have an image and the inventory slot
+        if (draggedImage != null && draggableInventorySlot != null)
         {
             _image.raycastTarget = true;
             // Get the index of this drop slot within its parent
             int dropSlotIndex = this.transform.GetSiblingIndex();
 
             // Trigger an event to update the UIManager or inventory
-            InventoryEvents.ItemSwapped(UIManager.Instance.PlayerInventory.Inventory[draggableItem.InventoryIndex], UIManager.Instance.PlayerInventory.Inventory[dropSlotIndex], draggableItem.InventoryIndex, dropSlotIndex);
+            InventoryEvents.ItemSwapped(InventoryManager.Instance.Inventory[draggableInventorySlot.InventoryIndex], InventoryManager.Instance.Inventory[dropSlotIndex], draggableInventorySlot.InventoryIndex, dropSlotIndex);
         }
     }
 }

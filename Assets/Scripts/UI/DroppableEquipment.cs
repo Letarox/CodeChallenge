@@ -14,10 +14,11 @@ public class DroppableEquipment : MonoBehaviour, IDropHandler, IPointerEnterHand
 
     public void OnDrop(PointerEventData eventData)
     {
+        //grab a handle of the image that was dragged and update the item to match the current selected item
         Image draggedImage = eventData.pointerDrag.GetComponent<Image>();
         if (draggedImage != null)
         {
-            _item = UIManager.Instance.PlayerInventory.Inventory[UIManager.Instance.CurrentSelectedItem];
+            _item = InventoryManager.Instance.Inventory[UIManager.Instance.CurrentSelectedItem];
             InventoryEvents.ItemEquipped(_item, UIManager.Instance.CurrentSelectedItem, _equipmentIndex);
         }
     }

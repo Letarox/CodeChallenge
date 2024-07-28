@@ -32,6 +32,7 @@ public class DraggableInventorySlot : MonoBehaviour, IDragHandler, IBeginDragHan
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        //if we dragged outside of a proper spot, we set the position back to the original position
         _image.raycastTarget = true;
         _image.rectTransform.localPosition = _originalPosition;
     }
