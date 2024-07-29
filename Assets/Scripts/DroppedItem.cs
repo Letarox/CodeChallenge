@@ -36,7 +36,7 @@ public class DroppedItem : MonoBehaviour
         {
             if(_playerInventory != null)
             {
-                InventoryEvents.AttempToPickupItem(_item);
+                InventoryEvents.AttempToPickupItem(_item, gameObject);
             }
         }
     }
@@ -68,8 +68,9 @@ public class DroppedItem : MonoBehaviour
         }
     }
 
-    void SelfDestruct()
+    void SelfDestruct(GameObject obj)
     {
-        Destroy(gameObject);
+        if(obj == gameObject)
+            Destroy(gameObject);
     }
 }

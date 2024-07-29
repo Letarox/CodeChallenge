@@ -17,4 +17,4 @@ MonoBehaviour:
 
     +3 Attack'
   _icon: {fileID: 21300000, guid: 8c22efba182f85341b205870c05d87b0, type: 3}
-  _equipmentType: 2
+  _itemType: 2

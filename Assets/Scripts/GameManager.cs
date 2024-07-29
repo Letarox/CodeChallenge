@@ -50,9 +50,10 @@ public enum ActionState
     Inventory
 }
 
-public enum EquipmentType
+public enum ItemType
 {
     Sword,
     Shield,
-    Axe
+    Axe,
+    Consumable
 }

@@ -64,12 +64,16 @@
     <Compile Include="Assets\Scripts\UI\DroppableEquipment.cs" />
     <Compile Include="Assets\Scripts\SaveLoadSystem.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\UI\DraggableConsumableSlot.cs" />
     <Compile Include="Assets\Scripts\InventoryManager.cs" />
     <Compile Include="Assets\Scripts\UI\DraggableInventorySlot.cs" />
     <Compile Include="Assets\Scripts\Item\Item.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\UI\DroppableConsumableSlot.cs" />
     <Compile Include="Assets\Scripts\DroppedItem.cs" />
+    <Compile Include="Assets\Scripts\UI\DraggableEquipmentSlot.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerInventory.cs" />
+    <Compile Include="Assets\Scripts\UI\DroppableEquipmentSlot.cs" />
     <Compile Include="Assets\Scripts\Player\InventoryEvents.cs" />
     <Compile Include="Assets\Scripts\UI\DroppableInventorySlot.cs" />
     <Compile Include="Assets\Scripts\UIManager.cs" />

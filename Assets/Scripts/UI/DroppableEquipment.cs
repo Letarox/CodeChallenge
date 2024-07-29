@@ -19,7 +19,7 @@ public class DroppableEquipment : MonoBehaviour, IDropHandler, IPointerEnterHand
         if (draggedImage != null)
         {
             _item = InventoryManager.Instance.Inventory[UIManager.Instance.CurrentSelectedItem];
-            InventoryEvents.ItemEquipped(_item, UIManager.Instance.CurrentSelectedItem, _equipmentIndex);
+            InventoryEvents.ItemEquippedFromInventory(_item, UIManager.Instance.CurrentSelectedItem, _equipmentIndex);
         }
     }
 

@@ -11,7 +11,7 @@ public class DroppableTrash : MonoBehaviour, IDropHandler
         Image draggedImage = eventData.pointerDrag.GetComponent<Image>();
         DraggableInventorySlot draggableItem = eventData.pointerDrag.GetComponent<DraggableInventorySlot>();
 
-        if (draggedImage != null && draggableItem != null)
+        if (draggedImage != null && draggedImage.sprite != UIManager.Instance.BlankSprite && draggableItem != null)
         {
             // Trigger an event to update the UIManager or inventory
             InventoryEvents.DiscardItem(draggableItem.InventoryIndex);

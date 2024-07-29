@@ -32,8 +32,9 @@ public class InventoryManager : MonoBehaviour
     }
     #endregion
 
-    [SerializeField] private Item[] _inventory = new Item[10]; // Adjust size as needed
-    [SerializeField] private Item[] _equippedItems = new Item[2]; // Assuming two slots for equipped items
+    [SerializeField] private Item[] _inventory = new Item[10];
+    [SerializeField] private Item[] _equippedItems = new Item[2];
+    [SerializeField] private Item _consumableItem;
     [SerializeField] private GameObject _itemOverworldPrefab;
     private float spawnRadius = 1.5f;
     private int cachedIndex = -1;
@@ -42,6 +43,7 @@ public class InventoryManager : MonoBehaviour
 
     public Item[] Inventory => _inventory;
     public Item[] EquippedItems => _equippedItems;
+    public Item ConsumableItem => _consumableItem;
 
     private void Start()
     {
@@ -55,16 +57,16 @@ public class InventoryManager : MonoBehaviour
 
     public void SaveInventory()
     {
-        SaveLoadSystem.SaveInventory(_inventory, _equippedItems);
+        SaveLoadSystem.SaveInventory(_inventory, _equippedItems, _consumableItem);
     }
 
     public void LoadInventory()
     {
         SaveData saveData = SaveLoadSystem.LoadInventory();
 
+        //if no data is found, uses default
         if (saveData == null)
         {
-            //no save data found, uses default inventory
             return;
         }
 
@@ -94,12 +96,23 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
+        //load the consumable item
+        if (saveData.ConsumableItem != null)
+        {
+            _consumableItem = saveData.ConsumableItem.ToItem();
+        }
+        else
+        {
+            _consumableItem = null;
+        }
+
         //lastly we update the UI
         UIManager.Instance.UpdateInventoryUI(_inventory);
         UIManager.Instance.UpdateEquippedItemsUI(_equippedItems);
+        UIManager.Instance.UpdateConsumableItemUI(_consumableItem);
     }
 
-    public void AddItemToInventory(Item newItem)
+    public void AddItemToInventory(Item newItem, GameObject obj)
     {
         //we check if our index is -1, which is its default value. Then we attribute the return of the CanPickup item to see if a slot is available
         if (cachedIndex == -1)
@@ -111,7 +124,7 @@ public class InventoryManager : MonoBehaviour
         if (cachedIndex != -1)
         {
             _inventory[cachedIndex] = newItem;
-            InventoryEvents.SuccessfulItemPickup();
+            InventoryEvents.SuccessfulItemPickup(obj);
             cachedIndex = -1;
         }
     }
@@ -132,22 +145,26 @@ public class InventoryManager : MonoBehaviour
     public void EquipItemFromInventory(Item item, int inventoryIndex, int equipmentIndex)
     {
         //ensure that swords are always in the main-hand and shields are in the off-hand
-        switch (item.EquipmentType)
+        switch (item.ItemType)
         {
-            case EquipmentType.Sword:
+            case ItemType.Sword:
                 if (equipmentIndex != 0)
                     equipmentIndex = 0;
                 break;
 
-            case EquipmentType.Shield:
+            case ItemType.Shield:
                 if (equipmentIndex != 1)
                     equipmentIndex = 1;
                 break;
+
+            case ItemType.Consumable:
+                return;
         }
 
+        //grab a handle of the current equipped item, and swap spots with the inventory slot. UIManager is also updated
         Item currentEquipped = _equippedItems[equipmentIndex];
         _equippedItems[equipmentIndex] = item;
-        UIManager.Instance.EquipItem(item, inventoryIndex, equipmentIndex);
+        UIManager.Instance.EquipItemFromInventory(item, inventoryIndex, equipmentIndex);
         _inventory[inventoryIndex] = currentEquipped;
     }
 
@@ -156,7 +173,63 @@ public class InventoryManager : MonoBehaviour
         //change slots for both received items and their respective indexes in the array
         _inventory[draggableIndex] = newItem;
         _inventory[index] = currentItem;
-        UIManager.Instance.ChangeItemPosition(currentItem, newItem, draggableIndex, index);
+        UIManager.Instance.ChangeItemPositionFromInventory(currentItem, newItem, draggableIndex, index);
+    }
+
+    public void EquipItemFromEquipment(Item item, int draggedIndex, int equipmentIndex)
+    {
+        //check if the new item is trying to change places with an item that can't be placed in its current slot
+        if ((_equippedItems[equipmentIndex].ItemType == ItemType.Sword && draggedIndex != 0) || (_equippedItems[equipmentIndex].ItemType == ItemType.Shield && draggedIndex != 1))
+            return;
+
+            //ensure that swords are always in the main-hand and shields are in the off-hand
+            switch (item.ItemType)
+        {
+            case ItemType.Sword:
+                if (equipmentIndex != 0)
+                    equipmentIndex = 0;
+                break;
+
+            case ItemType.Shield:
+                if (equipmentIndex != 1)
+                    equipmentIndex = 1;
+                break;
+        }
+
+        //grab a handle of the current equipped item, and swap spots with the inventory slot. UIManager is also updated
+        Item currentEquipped = _equippedItems[equipmentIndex];
+        _equippedItems[equipmentIndex] = item;
+        UIManager.Instance.EquipItemFromEquipment(item, draggedIndex, equipmentIndex);
+        _equippedItems[draggedIndex] = currentEquipped;
+    }
+
+    public void SwapItemFromEquipment(Item currentItem, Item newItem, int draggableIndex, int index)
+    {
+        // Change slots for both received items and their respective indexes in the array
+        _equippedItems[draggableIndex] = newItem;
+        _inventory[index] = currentItem;
+        UIManager.Instance.ChangeItemPositionFromEquipment(currentItem, newItem, draggableIndex, index);
+    }
+
+    public void EquipConsumableItem(Item item, int draggedIndex)
+    {
+        //check if the new item is trying to change places with an item that can't be placed in its current slot
+        if (item.ItemType != ItemType.Consumable)
+            return;
+
+        //grab a handle of the current equipped item, and swap spots with the inventory slot. UIManager is also updated
+        Item currentEquipped = _consumableItem;
+        _consumableItem = item;
+        UIManager.Instance.EquipConsumableItem(item, draggedIndex);
+        _inventory[draggedIndex] = currentEquipped;
+    }
+
+    public void SwapConsumableItem(Item currentItem, Item newItem, int draggableIndex)
+    {
+        //change slots for both received items and their respective indexes in the array
+        _consumableItem = newItem;
+        _inventory[draggableIndex] = currentItem;
+        UIManager.Instance.ChangeConsumableItemPosition(currentItem, newItem, draggableIndex);
     }
 
     public void RemoveItemFromInventory(int index)
@@ -176,5 +249,11 @@ public class InventoryManager : MonoBehaviour
         //instantiate the item and setup its data
         var tempItem = Instantiate(_itemOverworldPrefab, spawnPosition, Quaternion.identity);
         tempItem.GetComponent<DroppedItem>().SetupItem(item);
+    }
+
+    public void UseConsumableItem()
+    {
+        _consumableItem = null;
+        UIManager.Instance.StartCoroutine(UIManager.Instance.UsingConsumableRoutine());
     }
 }

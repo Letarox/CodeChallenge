@@ -7,14 +7,14 @@ public static class SaveLoadSystem
     private static string filePath = Application.persistentDataPath + "/inventory.save";
 
     //save the inventory and equipped items to a file
-    public static void SaveInventory(Item[] inventory, Item[] equippedItems)
+    public static void SaveInventory(Item[] inventory, Item[] equippedItems, Item consumableItem)
     {
         //creates a new BinaryFormater and FileStream to save the data
         BinaryFormatter formatter = new BinaryFormatter();
         using (FileStream stream = new FileStream(filePath, FileMode.Create))
         {
             //creates a new SaveData object from the current inventory and equipped items, then serializes the SaveData object to the file
-            SaveData saveData = new SaveData(inventory, equippedItems);
+            SaveData saveData = new SaveData(inventory, equippedItems, consumableItem);
             formatter.Serialize(stream, saveData);
         }
 

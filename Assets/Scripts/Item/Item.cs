@@ -9,11 +9,11 @@ public class Item : ScriptableObject
     [SerializeField] private string _name;
     [TextArea][SerializeField] string _description;
     [SerializeField] private Sprite _icon;
-    [SerializeField] private EquipmentType _equipmentType;
+    [SerializeField] private ItemType _itemType;
     public string Name => _name;
     public string Description => _description;
     public Sprite Icon => _icon;
-    public EquipmentType EquipmentType => _equipmentType;
+    public ItemType ItemType => _itemType;
 
     public void SetData(SerializableItem serializableItem)
     {
@@ -23,6 +23,6 @@ public class Item : ScriptableObject
         {
             _icon = Resources.Load<Sprite>(serializableItem.iconPath);
         }
-        _equipmentType = serializableItem.equipmentType;
+        _itemType = serializableItem.equipmentType;
     }
 }

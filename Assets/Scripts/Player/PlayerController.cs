@@ -24,7 +24,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (GameManager.Instance == null || GameManager.Instance.CurrentActionState != ActionState.None)
+        {
+            _movePos.x = 0;
+            _movePos.y = 0;
             return;
+        }
+           
 
         MovementInput();
     }
