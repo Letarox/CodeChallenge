@@ -1,14 +1,15 @@
-# Unity
-[Ll]ibrary/
-[Tt]emp/
-[Oo]bj/
-[Bb]uild/
-[Bb]uilds/
-[Ll]ogs/
-[Mm]emoryCaptures/
-*.pidb
-*.svd
-*.userprefs
+# Unity generated files
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+.vs/
+.vscode/
+.idea/
+.DS_Store
+
+# Visual Studio/MonoDevelop generated files
 *.csproj
 *.unityproj
 *.sln
@@ -19,25 +20,14 @@
 *.pidb
 *.booproj
 *.svd
-*.pdb
-*.opendb
-*.VC.db
-sysinfo.txt
-*.stackdump
 
-# Visual Studio
-.vscode/
-.vs/
-.vscode/settings.json
-*.code-workspace
-*.sln
-*.suo
-*.user
-*.userosscache
-*.userprefs
-*.csproj
-*.csproj.user
-*.pidb
-*.pdb
-*.opendb
-*.VC.db
+# Built application files
+*.apk
+*.unitypackage
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.Spotlight-V100
+.Trashes

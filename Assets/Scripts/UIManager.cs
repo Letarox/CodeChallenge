@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using System;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 
 public class UIManager : MonoBehaviour
 {
