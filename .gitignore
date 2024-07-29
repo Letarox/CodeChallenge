@@ -2,8 +2,6 @@
 Library/
 Temp/
 Obj/
-Build/
-Builds/
 .vs/
 .vscode/
 .idea/
